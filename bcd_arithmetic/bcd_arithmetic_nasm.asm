@@ -17,11 +17,11 @@ soma:
     push ebp            ; Salva o base pointer
     mov ebp, esp        ; Configura o novo base pointer
 
-    push ebx            ; Salva EBX, será usado
-    push edx            ; Salva EDX, será usado
-    push ecx            ; Salva ECX, será usado
-    push esi            ; Salva ESI, será usado
-    push edi            ; Salva EDI, será usado
+    push ebx 
+    push edx 
+    push ecx 
+    push esi 
+    push edi 
 
     mov eax, [ebp + 8]  ; EAX = primeiro operando (a) - valor BCD
     mov ebx, [ebp + 12] ; EBX = segundo operando (b) - valor BCD
