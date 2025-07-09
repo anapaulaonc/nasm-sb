@@ -2,7 +2,13 @@
 FEITO POR CADA UM:
 
 - Ana Paula e Tiago Buson: switch_example
-- Gabriel Cruz e Nicolas Paulin: bcd_arithmetic
-- sldies: TODOS
+- Gabriel Cruz, Nícolas e Eduardo Volpi: bcd_arithmetic
+
+
+- Ana Paula: códificação do switch_example
+- Tiago Buson: pair com a Ana Paula para correção do switch_example
+- Gabriel Cruz: código C com chamadas para o assembly BCD e início do código NASM para o BCD
+- Nícolas: código NASM para o BCD
+- Eduardo: correções em pair com Nícolas para arrumar o código NASM para BCD
 
 ######################################
