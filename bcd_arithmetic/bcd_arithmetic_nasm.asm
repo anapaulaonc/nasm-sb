@@ -16,9 +16,12 @@ global soma
 soma:
     push ebp            ; Salva o base pointer
     mov ebp, esp        ; Configura o novo base pointer
+
     push ebx            ; Salva EBX, será usado
     push edx            ; Salva EDX, será usado
     push ecx            ; Salva ECX, será usado
+    push esi            ; Salva ESI, será usado
+    push edi            ; Salva EDI, será usado
 
     mov eax, [ebp + 8]  ; EAX = primeiro operando (a) - valor BCD
     mov ebx, [ebp + 12] ; EBX = segundo operando (b) - valor BCD
@@ -77,7 +80,7 @@ soma:
 .nibble2_store:
     push ecx            ; Salva nibble 2 na pilha
 
-    ; --- Nibble 3 (mais significativo) ---
+    ; --- Nibble 3 ---
     mov ecx, eax        ; Copia 'a' para ECX
     shr ecx, 12         ; Desloca para pegar o nibble 3
     and ecx, 0x0F       ; Isola o nibble 3
@@ -89,30 +92,120 @@ soma:
     cmp ecx, 9
     jle .nibble3_ok
     sub ecx, 10
-    ; Carry seria perdido aqui, mas para 4 dígitos BCD é aceitável
+    mov edx, 1          ; Carry para o próximo nibble
+    jmp .nibble3_store
 .nibble3_ok:
+    mov edx, 0          ; Sem carry
+.nibble3_store:
     push ecx            ; Salva nibble 3 na pilha
 
-    ; Monta o resultado final
-    pop edi             ; Recupera nibble 3 (mais significativo)
-    pop esi             ; Recupera nibble 2
-    pop ebx             ; Recupera nibble 1
-    pop ecx             ; Recupera nibble 0 (menos significativo)
+    ; --- Nibble 4 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 16         ; Desloca para pegar o nibble 4
+    and ecx, 0x0F       ; Isola o nibble 4
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 16         ; Desloca para pegar o nibble 4
+    and esi, 0x0F       ; Isola o nibble 4
+    add ecx, esi        ; Soma os nibbles
+    add ecx, edx        ; Adiciona carry do nibble anterior
+    cmp ecx, 9
+    jle .nibble4_ok
+    sub ecx, 10
+    mov edx, 1          ; Carry para o próximo nibble
+    jmp .nibble4_store
+.nibble4_ok:
+    mov edx, 0          ; Sem carry
+.nibble4_store:
+    push ecx            ; Salva nibble 4 na pilha
 
-    shl edi, 12         ; Posiciona nibble 3
-    shl esi, 8          ; Posiciona nibble 2
-    shl ebx, 4          ; Posiciona nibble 1
-    ; ecx já está na posição correta (nibble 0)
+    ; --- Nibble 5 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 20         ; Desloca para pegar o nibble 5
+    and ecx, 0x0F       ; Isola o nibble 5
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 20         ; Desloca para pegar o nibble 5
+    and esi, 0x0F       ; Isola o nibble 5
+    add ecx, esi        ; Soma os nibbles
+    add ecx, edx        ; Adiciona carry do nibble anterior
+    cmp ecx, 9
+    jle .nibble5_ok
+    sub ecx, 10
+    mov edx, 1          ; Carry para o próximo nibble
+    jmp .nibble5_store
+.nibble5_ok:
+    mov edx, 0          ; Sem carry
+.nibble5_store:
+    push ecx            ; Salva nibble 5 na pilha
 
-    mov eax, ecx        ; Resultado inicial = nibble 0
-    or eax, ebx         ; Adiciona nibble 1
-    or eax, esi         ; Adiciona nibble 2
-    or eax, edi         ; Adiciona nibble 3
+    ; --- Nibble 6 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 24         ; Desloca para pegar o nibble 6
+    and ecx, 0x0F       ; Isola o nibble 6
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 24         ; Desloca para pegar o nibble 6
+    and esi, 0x0F       ; Isola o nibble 6
+    add ecx, esi        ; Soma os nibbles
+    add ecx, edx        ; Adiciona carry do nibble anterior
+    cmp ecx, 9
+    jle .nibble6_ok
+    sub ecx, 10
+    mov edx, 1          ; Carry para o próximo nibble
+    jmp .nibble6_store
+.nibble6_ok:
+    mov edx, 0          ; Sem carry
+.nibble6_store:
+    push ecx            ; Salva nibble 6 na pilha
 
-    pop ecx             ; Restaura ECX
-    pop edx             ; Restaura EDX
-    pop ebx             ; Restaura EBX
-    pop ebp             ; Restaura EBP
+    ; --- Nibble 7 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 28         ; Desloca para pegar o nibble 7
+    and ecx, 0x0F       ; Isola o nibble 7
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 28         ; Desloca para pegar o nibble 7
+    and esi, 0x0F       ; Isola o nibble 7
+    add ecx, esi        ; Soma os nibbles
+    add ecx, edx        ; Adiciona carry do nibble anterior
+    cmp ecx, 9
+    jle .nibble7_ok
+    sub ecx, 10
+    mov edx, 1          ; Carry para o próximo nibble
+    jmp .nibble7_store
+.nibble7_ok:
+    mov edx, 0          ; Sem carry
+.nibble7_store:
+    push ecx            ; Salva nibble 7 na pilha
+
+    ; Monta o resultado final (8 nibbles)
+    pop ecx             ; nibble 7
+    shl ecx, 28
+    pop ebx             ; nibble 6
+    shl ebx, 24
+    pop esi             ; nibble 5
+    shl esi, 20
+    pop edx             ; nibble 4
+    shl edx, 16
+    pop ebp             ; nibble 3
+    shl ebp, 12
+    pop edi             ; nibble 2
+    shl edi, 8
+    pop eax             ; nibble 1
+    shl eax, 4
+    pop ebx             ; nibble 0
+    or ebx, eax
+    or ebx, edi
+    or ebx, ebp
+    or ebx, edx
+    or ebx, esi
+    or ebx, ebx
+    or ebx, ecx
+    mov eax, ebx
+
+    pop edi
+    pop esi
+    pop ecx
+    pop edx
+    pop ebx
+    pop ebp
     ret
 
 global subtracao
@@ -123,6 +216,8 @@ subtracao:
     push ebx
     push edx
     push ecx
+    push esi
+    push edi
 
     mov eax, [ebp + 8]  ; EAX = primeiro operando (a) - valor BCD
     mov ebx, [ebp + 12] ; EBX = segundo operando (b) - valor BCD
@@ -181,7 +276,7 @@ subtracao:
 .sub_nibble2_store:
     push ecx            ; Salva nibble 2 na pilha
 
-    ; --- Nibble 3 (mais significativo) ---
+    ; --- Nibble 3 ---
     mov ecx, eax        ; Copia 'a' para ECX
     shr ecx, 12         ; Desloca para pegar o nibble 3
     and ecx, 0x0F       ; Isola o nibble 3
@@ -193,26 +288,116 @@ subtracao:
     cmp ecx, 0
     jge .sub_nibble3_ok
     add ecx, 10
-    ; Borrow seria perdido aqui, mas para 4 dígitos BCD é aceitável
+    mov edx, 1          ; Borrow para o próximo nibble
+    jmp .sub_nibble3_store
 .sub_nibble3_ok:
+    mov edx, 0          ; Sem borrow
+.sub_nibble3_store:
     push ecx            ; Salva nibble 3 na pilha
 
-    ; Monta o resultado final
-    pop edi             ; Recupera nibble 3 (mais significativo)
-    pop esi             ; Recupera nibble 2
-    pop ebx             ; Recupera nibble 1
-    pop ecx             ; Recupera nibble 0 (menos significativo)
+    ; --- Nibble 4 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 16         ; Desloca para pegar o nibble 4
+    and ecx, 0x0F       ; Isola o nibble 4
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 16         ; Desloca para pegar o nibble 4
+    and esi, 0x0F       ; Isola o nibble 4
+    sub ecx, esi        ; Subtrai os nibbles
+    sub ecx, edx        ; Subtrai borrow do nibble anterior
+    cmp ecx, 0
+    jge .sub_nibble4_ok
+    add ecx, 10
+    mov edx, 1          ; Borrow para o próximo nibble
+    jmp .sub_nibble4_store
+.sub_nibble4_ok:
+    mov edx, 0          ; Sem borrow
+.sub_nibble4_store:
+    push ecx            ; Salva nibble 4 na pilha
 
-    shl edi, 12         ; Posiciona nibble 3
-    shl esi, 8          ; Posiciona nibble 2
-    shl ebx, 4          ; Posiciona nibble 1
-    ; ecx já está na posição correta (nibble 0)
+    ; --- Nibble 5 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 20         ; Desloca para pegar o nibble 5
+    and ecx, 0x0F       ; Isola o nibble 5
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 20         ; Desloca para pegar o nibble 5
+    and esi, 0x0F       ; Isola o nibble 5
+    sub ecx, esi        ; Subtrai os nibbles
+    sub ecx, edx        ; Subtrai borrow do nibble anterior
+    cmp ecx, 0
+    jge .sub_nibble5_ok
+    add ecx, 10
+    mov edx, 1          ; Borrow para o próximo nibble
+    jmp .sub_nibble5_store
+.sub_nibble5_ok:
+    mov edx, 0          ; Sem borrow
+.sub_nibble5_store:
+    push ecx            ; Salva nibble 5 na pilha
 
-    mov eax, ecx        ; Resultado inicial = nibble 0
-    or eax, ebx         ; Adiciona nibble 1
-    or eax, esi         ; Adiciona nibble 2
-    or eax, edi         ; Adiciona nibble 3
+    ; --- Nibble 6 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 24         ; Desloca para pegar o nibble 6
+    and ecx, 0x0F       ; Isola o nibble 6
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 24         ; Desloca para pegar o nibble 6
+    and esi, 0x0F       ; Isola o nibble 6
+    sub ecx, esi        ; Subtrai os nibbles
+    sub ecx, edx        ; Subtrai borrow do nibble anterior
+    cmp ecx, 0
+    jge .sub_nibble6_ok
+    add ecx, 10
+    mov edx, 1          ; Borrow para o próximo nibble
+    jmp .sub_nibble6_store
+.sub_nibble6_ok:
+    mov edx, 0          ; Sem borrow
+.sub_nibble6_store:
+    push ecx            ; Salva nibble 6 na pilha
 
+    ; --- Nibble 7 ---
+    mov ecx, eax        ; Copia 'a' para ECX
+    shr ecx, 28         ; Desloca para pegar o nibble 7
+    and ecx, 0x0F       ; Isola o nibble 7
+    mov esi, ebx        ; Copia 'b' para ESI
+    shr esi, 28         ; Desloca para pegar o nibble 7
+    and esi, 0x0F       ; Isola o nibble 7
+    sub ecx, esi        ; Subtrai os nibbles
+    sub ecx, edx        ; Subtrai borrow do nibble anterior
+    cmp ecx, 0
+    jge .sub_nibble7_ok
+    add ecx, 10
+    mov edx, 1          ; Borrow para o próximo nibble
+    jmp .sub_nibble7_store
+.sub_nibble7_ok:
+    mov edx, 0          ; Sem borrow
+.sub_nibble7_store:
+    push ecx            ; Salva nibble 7 na pilha
+
+    ; Monta o resultado final (8 nibbles)
+    pop ecx             ; nibble 7
+    shl ecx, 28
+    pop ebx             ; nibble 6
+    shl ebx, 24
+    pop esi             ; nibble 5
+    shl esi, 20
+    pop edx             ; nibble 4
+    shl edx, 16
+    pop ebp             ; nibble 3
+    shl ebp, 12
+    pop edi             ; nibble 2
+    shl edi, 8
+    pop eax             ; nibble 1
+    shl eax, 4
+    pop ebx             ; nibble 0
+    or ebx, eax
+    or ebx, edi
+    or ebx, ebp
+    or ebx, edx
+    or ebx, esi
+    or ebx, ebx
+    or ebx, ecx
+    mov eax, ebx
+
+    pop edi
+    pop esi
     pop ecx
     pop edx
     pop ebx
