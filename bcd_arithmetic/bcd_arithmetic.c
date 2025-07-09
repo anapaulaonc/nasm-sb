@@ -4,8 +4,8 @@
 typedef uint32_t u4;
 typedef uint64_t u8;
 
-extern u4 soma( u4 a, u4 b);
-extern u4 subtracao(a, b);
+extern u4 soma(u4 a, u4 b);
+extern u4 subtracao(u4 a, u4 b);
 
 u4 convert_u4_to_bcd (u4 num)
     {
@@ -45,9 +45,11 @@ int main()
             printf("primeiro operando: ");
             scanf("%u", &a);
             a = convert_u4_to_bcd(a);
+            printf("0x%x", a);
             printf("\nsegundo operando: ");
             scanf("%u", &b);
             b = convert_u4_to_bcd(b);
+            printf("0x%x", b);
             result = soma(a, b);
             break;
         case 2:
@@ -63,6 +65,6 @@ int main()
         default:
             break;
     }
-    printf("Resultado: %u", result);
+    printf("\nResultado: %x\n", result);
     return 0;
 }

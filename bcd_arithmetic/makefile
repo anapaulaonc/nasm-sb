@@ -1,8 +1,10 @@
 
 ASM = nasm
 TARGET = bcd_arithmetic
-SRC = bcd_arithmetic.asm
-OBJ = bcd_arithmetic.o
+SRC_C = bcd_arithmetic.c
+SRC_ASM = bcd_arithmetic_nasm.asm
+OBJ = bcd_arithmetic.o bcd_arithmetic_nasm.o
+
 
 # Detecta sistema operacional e arquitetura
 OS := $(shell uname -s)
@@ -21,14 +23,14 @@ ifeq ($(OS),Darwin)
 else ifeq ($(OS),Linux)
     # Linux
     CC = gcc
-    ASMFLAGS = -f elf64
-    CCFLAGS = -m64 -no-pie -static
+    ASMFLAGS = -f elf32
+    CCFLAGS = -m32 -no-pie -static
     PLATFORM_MSG = Linux
     ARCH_MSG = $(ARCH)
 else
     CC = gcc
-    ASMFLAGS = -f elf64
-    CCFLAGS = -m64
+    ASMFLAGS = -f elf32
+    CCFLAGS = -m32
     PLATFORM_MSG = Outro/Windows
     ARCH_MSG = $(ARCH)
 endif
@@ -61,9 +63,12 @@ $(TARGET): $(OBJ)
 	@echo "$(GREEN)✓ Programa compilado: $(TARGET)$(NC)"
 
 # Compila o arquivo assembly
-$(OBJ): $(SRC)
-	@echo "$(YELLOW)Compilando $(SRC)...$(NC)"
-	$(ASM) $(ASMFLAGS) $(SRC) -o $(OBJ)
+bcd_arithmetic.o: bcd_arithmetic.c
+	$(CC) $(CCFLAGS) -c $< -o $@
+
+bcd_arithmetic_nasm.o: bcd_arithmetic_nasm.asm
+	$(ASM) $(ASMFLAGS) $< -o $@
+
 
 # Executa o programa
 run: $(TARGET)

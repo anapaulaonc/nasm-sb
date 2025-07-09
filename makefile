@@ -22,7 +22,7 @@ else ifeq ($(OS),Linux)
     # Linux
     CC = gcc
     ASMFLAGS = -f elf64
-    CCFLAGS = -m64 -no-pie -static
+    CCFLAGS = -m32 -no-pie -static
     PLATFORM_MSG = Linux
     ARCH_MSG = $(ARCH)
 else

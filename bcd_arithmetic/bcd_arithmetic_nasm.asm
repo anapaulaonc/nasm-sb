@@ -7,20 +7,27 @@ section .text
 ;rax - saida
 
 ;################################################
-
+extern printf
 global soma
 soma:
-    mov rax, rdi
-    add rax, rsi
+    push ebp
+    mov ebp, esp
+
+    mov eax, [ebp + 8]
+    add eax, [ebp + 12]
     das
+
+    pop ebp
     ret
 
 global subtracao
 subtracao:
-    mov rax, rdi
-    sub rax, rsi
-    dasb
+    push ebp
+    mov ebp, esp
+
+    mov eax, [ebp + 8]
+    sub eax, [ebp + 12]
+    das
+
+    pop ebp
     ret
-
-
-
