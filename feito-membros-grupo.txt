@@ -1,0 +1,8 @@
+######################################
+FEITO POR CADA UM:
+
+- Ana Paula e Tiago Buson: switch_example
+- Gabriel Cruz e Nicolas Paulin: bcd_arithmetic
+- sldies: TODOS
+
+######################################
